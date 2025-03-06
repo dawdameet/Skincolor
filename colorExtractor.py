@@ -13,7 +13,6 @@ def extract_skin_tone(image: np.ndarray, exclude_beard: bool = False) -> np.ndar
     """
     h, w, _ = image.shape
 
-    # Initialize MediaPipe Face Mesh in static image mode
     mp_face_mesh = mp.solutions.face_mesh
     with mp_face_mesh.FaceMesh(
         static_image_mode=True,
@@ -25,8 +24,6 @@ def extract_skin_tone(image: np.ndarray, exclude_beard: bool = False) -> np.ndar
         if not results.multi_face_landmarks:
             print("No face detected in the image.")
             return None
-
-        # Define indices corresponding to key regions
         landmark_indices = [
             10,  67,  69,  104, 108, 109, 151,  # Forehead
             116, 117, 118, 119, 123, 147, 187,   # Upper cheeks
@@ -34,48 +31,33 @@ def extract_skin_tone(image: np.ndarray, exclude_beard: bool = False) -> np.ndar
             50, 101, 100, 47, 205                # Eye sockets
         ]
 
-        # Get landmarks for the first face
         face_landmarks = results.multi_face_landmarks[0]
         points = [(int(landmark.x * w), int(landmark.y * h)) for landmark in face_landmarks.landmark]
         
-        # Append selected landmarks to focus on important skin regions
         for i in landmark_indices:
             landmark = face_landmarks.landmark[i]
             points.append((int(landmark.x * w), int(landmark.y * h)))
-        # Create a binary mask from the convex hull of the combined landmarks
         mask = np.zeros((h, w), dtype=np.uint8)
         points_np = np.array(points, dtype=np.int32)
-        # Optionally, you could compute separate convex hulls for different facial regions
-        # Here, we use one overall hull
         cv2.fillConvexPoly(mask, points_np, 255)
         
-        # Optionally exclude beard region using bounding rectangle heuristics
         if exclude_beard:
             x, y, w_rect, h_rect = cv2.boundingRect(points_np)
             exclusion_y = y + int(h_rect * 0.7)  # exclude bottom 30%
             mask[exclusion_y:y+h_rect, x:x+w_rect] = 0
 
-        # Apply morphological closing to smooth and fill small holes
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-        # Further smooth the mask edges using Gaussian blur
         smooth_mask = cv2.GaussianBlur(mask, (25, 25), 0)
 
-        # Convert image to HSV and extract the Value channel (brightness)
         hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
         value_channel = hsv[:, :, 2]
-        # Create a brightness mask to filter out very dark areas (e.g., shadows, makeup)
         _, brightness_mask = cv2.threshold(value_channel, 40, 255, cv2.THRESH_BINARY)
-        # Combine the smooth mask with the brightness mask
         final_mask = cv2.bitwise_and(smooth_mask, brightness_mask)
-
-        # Extract skin region using the final mask
         skin_region = cv2.bitwise_and(image, image, mask=final_mask)
         indices = np.where(final_mask != 0)
         if len(indices[0]) == 0:
             return None
-
-        # Use brightness as weights when averaging to give higher contribution to well-lit areas
         weights = value_channel[indices].astype(float) / 255.0
         avg_color = np.average(skin_region[indices], axis=0, weights=weights)
         return avg_color.astype(np.uint8)
@@ -101,7 +83,6 @@ def process_images(image_paths: list, exclude_beard: bool) -> np.ndarray:
     if not skin_tones:
         return None
 
-    # Compute overall average skin tone across all images
     overall_avg = np.mean(skin_tones, axis=0).astype(np.uint8)
     return overall_avg
 
@@ -117,7 +98,6 @@ def main():
     overall_skin_tone = process_images(args.images, exclude_beard=args.exclude_beard)
     if overall_skin_tone is not None:
         print("Final Overall Average Skin Tone (RGB):", overall_skin_tone.tolist())
-        # Create a color swatch for visualization
         swatch = np.zeros((100, 100, 3), dtype=np.uint8)
         swatch[:] = overall_skin_tone
         cv2.imshow("Overall Average Skin Tone", cv2.cvtColor(swatch, cv2.COLOR_RGB2BGR))
