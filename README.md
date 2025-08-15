@@ -1,60 +1,63 @@
-NeuraStyle
+# **NeuraStyle**
 
-AI-Powered Skin Tone Analysis & Color Harmony
+**AI-Powered Skin Tone Analysis & Color Harmony**
 
-NeuraStyle is an advanced skin tone recognition and color recommendation system built with MediaPipe, OpenCV, and PyTorch. It detects accurate skin tones, eliminates noise (beards, goggles, shadows), and provides harmonious color suggestions based on color theory.
+NeuraStyle is an advanced **skin tone recognition and color recommendation** system built with **MediaPipe, OpenCV, and PyTorch**. It detects accurate skin tones, eliminates noise (beards, goggles, shadows), and provides **harmonious color suggestions** based on **color theory**.
 
-Features
+## **Features**
 
-Accurate Skin Tone Detection – Utilizes MediaPipe Face Mesh for precise face segmentation.
+* **Accurate Skin Tone Detection** – Utilizes MediaPipe Face Mesh for precise face segmentation.
+* **Noise Reduction** – Excludes beard, goggles, and non-skin areas for higher accuracy.
+* **Multi-Image Processing** – Enhances precision by analyzing multiple images.
+* **Color Recommendation** – Suggests the best-matching colors based on detected skin tone.
+* **Custom Correction Mode** – Allows manual input if the detected color is incorrect.
+* **Neural Network Training** – Continuously improves accuracy using user feedback.
 
-Noise Reduction – Excludes beard, goggles, and non-skin areas for higher accuracy.
+## **Installation**
 
-Multi-Image Processing – Enhances precision by analyzing multiple images.
-
-Color Recommendation – Suggests the best-matching colors based on detected skin tone.
-
-Custom Correction Mode – Allows manual input if the detected color is incorrect.
-
-Neural Network Training – Continuously improves accuracy using user feedback.
-
-Installation
+```bash
 git clone https://github.com/dawdameet/NeuraStyle.git
 cd NeuraStyle
 pip install -r requirements.txt
+```
 
-Usage
-1. Extract Skin Tone
+## **Usage**
+
+### **1. Extract Skin Tone**
+
+```bash
 python detect_skin.py --images path/to/image1.jpg path/to/image2.jpg
+```
 
+* Use `--exclude_beard` to ignore the lower face area.
 
-Use --exclude_beard to ignore the lower face area.
+### **2. Color Harmony Recommendation**
 
-2. Color Harmony Recommendation
+```bash
 python suggest_colors.py --rgb 200 150 120
+```
 
+* Input detected RGB values for personalized color recommendations.
 
-Input detected RGB values for personalized color recommendations.
+### **3. Train Neural Network (Optional)**
 
-3. Train Neural Network (Optional)
+```bash
 python train_correction.py --dataset path/to/dataset/
+```
 
+* Improves model accuracy based on corrected inputs.
 
-Improves model accuracy based on corrected inputs.
+## **Example Output**
 
-Example Output
+**Detected Skin Tone (RGB):** `[205, 160, 140]`
+**Recommended Colors:** `#FF5733 (Warm Red)`, `#FFD700 (Golden Yellow)`, `#8A2BE2 (Deep Purple)`
 
-Detected Skin Tone (RGB): [205, 160, 140]
-Recommended Colors: #FF5733 (Warm Red), #FFD700 (Golden Yellow), #8A2BE2 (Deep Purple)
+## **Future Enhancements**
 
-Future Enhancements
+* Real-time skin tone detection via webcam.
+* Advanced neural network for fine-tuned accuracy.
+* Personalized fashion and makeup recommendations.
 
-Real-time skin tone detection via webcam.
+## **Author**
 
-Advanced neural network for fine-tuned accuracy.
-
-Personalized fashion and makeup recommendations.
-
-Author
-
-Developed by Meet Dawda
+Developed by **[Meet Dawda](https://github.com/dawdameet)**
